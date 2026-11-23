@@ -38,6 +38,19 @@ Ein Mac ist **nicht** nötig: Gebaut und hochgeladen wird auf einem macOS-Runner
 
 ---
 
+## Schnellstart ohne Developer-Account: Sideload mit SideStore / AltStore
+
+Bei jedem Push baut GitHub Actions automatisch eine **unsignierte `DriveDeck.ipa`** (ohne CarPlay-Berechtigung) und veröffentlicht sie im Release **`sideload-latest`** (Repo → *Releases*). Manuell geht es über *Actions → iOS → Run workflow* (Haken „TestFlight“ aus lassen).
+
+1. **SideStore** (<https://sidestore.io>) oder **AltStore** (<https://altstore.io>) einmalig nach deren Anleitung einrichten – dafür reicht eine kostenlose Apple-ID.
+2. Auf dem iPhone in Safari bei GitHub anmelden, Release `sideload-latest` öffnen und `DriveDeck.ipa` laden.
+3. In der Dateien-App die IPA antippen → *Teilen* → **SideStore** bzw. **AltStore** – oder in SideStore/AltStore unter *My Apps* auf **+** tippen und die IPA wählen.
+4. Bei kostenloser Apple-ID: *Einstellungen → Allgemein → VPN und Geräteverwaltung* → deiner Apple-ID vertrauen; ab iOS 16 zusätzlich *Einstellungen → Datenschutz & Sicherheit → Entwicklermodus* einschalten.
+
+Einschränkungen mit kostenloser Apple-ID: Die Signatur läuft nach **7 Tagen** ab (SideStore/AltStore erneuern sie im Hintergrund, solange die App ab und zu geöffnet wird), maximal 3 sideloadete Apps gleichzeitig, und **kein CarPlay** – dafür braucht es Apples Freigabe (siehe unten).
+
+---
+
 ## Auf dein iPhone über TestFlight – Schritt für Schritt
 
 ### 1. Apple Developer Program
@@ -74,7 +87,7 @@ Repository → **Settings → Secrets and variables → Actions**
 | Variable *(optional)* | `BUNDLE_ID` | deine Bundle-ID, Standard: `de.manuklang.drivedeck` |
 
 ### 6. Build hochladen
-GitHub → **Actions → iOS → Run workflow**
+GitHub → **Actions → iOS → Run workflow**, Haken **„Zu TestFlight hochladen“** setzen
 - Haken **„CarPlay-Entitlement einbinden“** nur setzen, wenn Apple die CarPlay-Berechtigung freigegeben und du sie bei der App-ID aktiviert hast – sonst schlägt die Signierung fehl.
 - Nach ca. 10 Minuten ist der Build in App Store Connect unter **TestFlight** sichtbar (Apple verarbeitet ihn danach noch 5–30 Minuten).
 
