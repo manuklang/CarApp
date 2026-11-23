@@ -15,10 +15,15 @@ struct DashboardView: View {
                         if model.location.authorization == .denied || model.location.authorization == .restricted {
                             PermissionBanner()
                         }
-                        LazyVGrid(columns: columns(landscape: landscape), spacing: 12) {
-                            ForEach(settings.widgets) { kind in
-                                WidgetCard(kind: kind, landscape: landscape)
-                                    .gridCellColumns(kind.isWide && !landscape ? 2 : 1)
+                        ForEach(Array(groups(landscape: landscape).enumerated()), id: \.offset) { _, group in
+                            if group.count == 1, group[0].isWide, !landscape {
+                                WidgetCard(kind: group[0], landscape: landscape)
+                            } else {
+                                LazyVGrid(columns: columns(landscape: landscape), spacing: 12) {
+                                    ForEach(group) { kind in
+                                        WidgetCard(kind: kind, landscape: landscape)
+                                    }
+                                }
                             }
                         }
                     }
@@ -30,7 +35,7 @@ struct DashboardView: View {
             .navigationTitle("DriveDeck")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Button { showSettings = true } label: { Image(systemName: "slider.horizontal.3") }
                         .accessibilityLabel("Einstellungen")
                 }
@@ -43,6 +48,23 @@ struct DashboardView: View {
                     .tint(settings.accent.color)
             }
         }
+    }
+
+    /// Im Hochformat stehen breite Widgets (Tacho, Fahrt) allein in einer Zeile.
+    private func groups(landscape: Bool) -> [[WidgetKind]] {
+        if landscape { return [settings.widgets] }
+        var result: [[WidgetKind]] = []
+        var current: [WidgetKind] = []
+        for kind in settings.widgets {
+            if kind.isWide {
+                if !current.isEmpty { result.append(current); current = [] }
+                result.append([kind])
+            } else {
+                current.append(kind)
+            }
+        }
+        if !current.isEmpty { result.append(current) }
+        return result
     }
 
     private func columns(landscape: Bool) -> [GridItem] {
